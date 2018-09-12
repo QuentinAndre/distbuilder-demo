@@ -4,12 +4,49 @@
     <link type="text/css" rel="stylesheet" href="distributionbuilder.css">
 </head>
 <body>
-<div id="distbuilder" style="width:700px"></div>
+<div id="distbuilder" style="width:800px"></div>
+<div id="information" style="text-align: center;font-weight:bold">The distribution has a mean of 0.00 and a SD of 0.00</div>
+
 <script>
-    var distbuilder = new DistributionBuilder();
+    function allocToDist(x) {
+        var dist = [];
+        x.map(function (element, index) {
+            var i;
+            for (i = 0; i < element; i++) {
+                dist.push(index * 2 + 1)
+            }
+        });
+        return dist
+    }
+
+    function computeMean(x) {
+        return x.reduce(function (p, c) {
+            return p + c
+        }, 0) / x.length;
+    }
+
+    function computeStd(x, mean) {
+        return Math.pow(computeMean(x.map(function (i) {
+            return Math.pow((i-mean), 2)
+        }, 0)), 1/2);
+    }
+
+    var distbuilder = new DistributionBuilder({
+        nRows: 26,
+        nBuckets: 25,
+        nBalls: 26,
+        onTouch: function () {
+        },
+        onChange: function () {
+            var dist = allocToDist(distbuilder.getDistribution());
+            var mean = computeMean(dist);
+            var std = computeStd(dist, mean);
+            $j("#information").text("The distribution has a mean of " + parseFloat(mean).toFixed(2) + " and a SD of " + parseFloat(std).toFixed(2));
+        }
+    });
+    var labels = ['$1', '$3', '$5', '$7', '$9', '$11', '$13', '$15', '$17', '$19', '$21', '$23', '$25', '$27', '$29', '$31', '$33', '$35', '$37', '$39', '$41', '$43', '$45', '$47', '$49'];
     distbuilder.render('distbuilder');
-    distbuilder.labelize({labels: ["1-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40", "41-45", "46-50"]});
-    //distbuilder.labelize({labels: ["1-10", "11-20", "21-30", "31-40", "41-50", "51-60", "61-70", "71-80", "81-90", "91-100"]});
+    distbuilder.labelize({labels: labels});
 </script>
 </body>
 </html>
